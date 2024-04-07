@@ -101,6 +101,18 @@
   bottom: 4px;
 }
 
+.wrapTitleStyle {
+  width: 180px;
+  overflow: hidden;
+}
+
+.marquee {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: marquee 5s linear infinite;
+}
+
 @media screen and (max-width: 950px) {
   .imgStyle {
     max-height: 120px;
@@ -125,5 +137,17 @@
   .wrapVoteStyle {
     position: relative;
     right: 110px;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(50%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
   }
 }

@@ -12,6 +12,7 @@ import { LoadingOutlined } from '@ant-design/icons'
 import Header from '../header/Header'
 import List from '../list/List'
 import RatedFilms from '../ratedFilms/RatedFilms'
+import PropTypes from 'prop-types'
 
 export const FilmContext = createContext()
 
@@ -160,14 +161,6 @@ const Context = (props) => {
 
   // функция GET оцененного фильма
   const getRatedMovie = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: authenticationToken,
-      },
-    }
-
     try {
       const res = await fetch(
         `https://api.themoviedb.org/3/guest_session/${guestSessionId}/rated/movies?api_key=${apiKey}`,
@@ -261,6 +254,10 @@ const Context = (props) => {
       )}
     </FilmContext.Provider>
   )
+}
+
+Context.propTypes = {
+  children: PropTypes.node,
 }
 
 export default Context

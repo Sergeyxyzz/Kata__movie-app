@@ -1,10 +1,8 @@
-// ниже исключения на marquee behavior="alternate"
-/* eslint-disable react/no-unknown-property */
-/* eslint-disable jsx-a11y/no-distracting-elements */
 import React, { useContext } from 'react'
 import './styles.css'
 import { Card, Flex, Rate } from 'antd'
 import { FilmContext } from '../context/Context'
+import PropTypes from 'prop-types'
 
 const shortenText = (description, maxLength = 140) => {
   if (description.length <= maxLength) {
@@ -45,9 +43,7 @@ const FilmCard = ({ filmData }) => {
           <div className="wrapInformation">
             <div className="headerTextStyle">
               <div className="wrapTitleStyle">
-                <marquee behavior="alternate">
-                  <h3>{filmData.original_title}</h3>
-                </marquee>
+                <h3 className="marquee">{filmData.original_title}</h3>
               </div>
               <div className="wrapVoteStyle">
                 <h3
@@ -99,6 +95,18 @@ const FilmCard = ({ filmData }) => {
       </Flex>
     </Card>
   )
+}
+
+FilmCard.propTypes = {
+  filmData: PropTypes.shape({
+    poster_path: PropTypes.string,
+    original_title: PropTypes.string.isRequired,
+    vote_average: PropTypes.number.isRequired,
+    release_date: PropTypes.string,
+    genre_ids: PropTypes.arrayOf(PropTypes.number).isRequired,
+    overview: PropTypes.string,
+    id: PropTypes.number.isRequired,
+  }).isRequired,
 }
 
 export default FilmCard
