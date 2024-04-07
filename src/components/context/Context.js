@@ -44,7 +44,6 @@ const Context = (props) => {
   useEffect(() => {
     setCategories(<List />)
 
-    // создал сессию
     fetch(
       'https://api.themoviedb.org/3/authentication/guest_session/new',
       options,
@@ -66,14 +65,12 @@ const Context = (props) => {
         console.error(err)
       })
 
-    // получил жанры
     fetch('https://api.themoviedb.org/3/genre/movie/list', options)
       .then((response) => response.json())
       .then((response) => setGenres(response.genres))
       .catch((err) => console.error(err))
   }, [options])
 
-  // смена табов
   const items = [
     {
       key: '1',
@@ -93,7 +90,6 @@ const Context = (props) => {
     setCategories(selectedComponent)
   }
 
-  // покраска кружочка
   const getColorByRating = (rating) => {
     if (rating >= 0 && rating < 3) {
       return '#E90000'
@@ -106,7 +102,6 @@ const Context = (props) => {
     }
   }
 
-  // поиск фильмов (может показаться, что useCallBack здесь не нужен и + про это говорит линтер, но если убрать useCallback и присвоить только debounce - то начинается бесконечный ререндер)
   const searchMovie = useCallback(
     debounce((title) => {
       setIsLoadingMovies(true)
@@ -135,7 +130,6 @@ const Context = (props) => {
     searchMovie(title.trim())
   }, [searchMovie, title])
 
-  // функция POST фильма на сервер
   const addMovieRating = async (id, rating) => {
     const options = {
       method: 'POST',
@@ -159,7 +153,6 @@ const Context = (props) => {
     }
   }
 
-  // функция GET оцененного фильма
   const getRatedMovie = async () => {
     try {
       const res = await fetch(
@@ -188,7 +181,6 @@ const Context = (props) => {
     }
   }
 
-  // функция: оценка фильма, потом POST, потом GET
   const handleGrade = (rate, id) => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -196,8 +188,8 @@ const Context = (props) => {
           ...saveRating,
           [id]: rate,
         })
-        await addMovieRating(id, rate) // отправил фильм на сервер
-        await getRatedMovie() // получил фильм с сервера
+        await addMovieRating(id, rate) 
+        await getRatedMovie() 
         resolve()
       } catch (error) {
         console.error(error)
