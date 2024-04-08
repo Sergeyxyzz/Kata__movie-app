@@ -21,15 +21,19 @@ const Context = (props) => {
   const [allMovies, setAllMovies] = useState([])
   const [isLoadingMovies, setIsLoadingMovies] = useState(true)
   const [error, setError] = useState(null)
-  const [categories, setCategories] = useState()
+  const [categories, setCategories] = useState(null)
   const [guestSessionId, setGuestSessionId] = useState(null)
   const [genres, setGenres] = useState([])
   const [ratedFilms, setRatedFilms] = useState([])
   const [saveRating, setSaveRating] = useState({})
   const [flagSwithcer, setFlagSwitcher] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalResults, setTotalResults] = useState(null)
   const apiKey = 'ea0641aa27683a6a9db5de1a1e5bdaef'
   const authenticationToken =
     'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYTA2NDFhYTI3NjgzYTZhOWRiNWRlMWExZTViZGFlZiIsInN1YiI6IjY1ZjgzZTI4Mjg3MjNjMDE3Y2JhM2QzOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.LhX-bU4esDbg5pRbphVtqsvaqgzXmtqxrVEfrHlNwMQ'
+
   const options = useMemo(
     () => ({
       method: 'GET',
@@ -102,33 +106,48 @@ const Context = (props) => {
     }
   }
 
+  const handleChangePage = (page) => {
+    setCurrentPage(page)
+    searchMovie(title.trim(), page)
+  }
+
   const searchMovie = useCallback(
-    debounce((title) => {
+    debounce((title, page) => {
       setIsLoadingMovies(true)
 
-      fetch(`https://api.themoviedb.org/3/search/movie?query=${title}`, options)
-        .then((resp) => {
-          if (!resp.ok) {
+      fetch(
+        `https://api.themoviedb.org/3/search/movie?query=${title}&include_adult=false&language=en-US&page=${page}`,
+        options,
+      )
+        .then((response) => {
+          if (!response.ok) {
             throw new Error('No connection')
           }
-          return resp.json()
+          return response.json()
         })
-        .then((resp) => {
-          setAllMovies(resp.results)
+        .then((response) => {
+          setAllMovies(response.results)
+          setTotalPages(response.total_pages)
+          setTotalResults(response.total_results)
+          setIsLoadingMovies(false)
         })
         .catch((err) => {
           setError(err)
-        })
-        .finally(() => {
           setIsLoadingMovies(false)
         })
     }, 500),
-    [options, setAllMovies, setIsLoadingMovies, setError],
+    [options, setAllMovies, setIsLoadingMovies, setError, setTotalPages],
   )
 
   useEffect(() => {
-    searchMovie(title.trim())
-  }, [searchMovie, title])
+    searchMovie(title.trim(), currentPage)
+  }, [searchMovie, title, currentPage])
+
+  useEffect(() => {
+    if (title.trim()) {
+      setCurrentPage(1)
+    }
+  }, [title])
 
   const addMovieRating = async (id, rating) => {
     const options = {
@@ -188,8 +207,8 @@ const Context = (props) => {
           ...saveRating,
           [id]: rate,
         })
-        await addMovieRating(id, rate) 
-        await getRatedMovie() 
+        await addMovieRating(id, rate)
+        await getRatedMovie()
         resolve()
       } catch (error) {
         console.error(error)
@@ -217,6 +236,10 @@ const Context = (props) => {
     flagSwithcer,
     getColorByRating,
     genres,
+    handleChangePage,
+    currentPage,
+    totalPages,
+    totalResults,
   }
 
   return (

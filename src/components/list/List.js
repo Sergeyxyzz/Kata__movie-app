@@ -8,14 +8,6 @@ import FilmCard from '../filmCard/FilmCard'
 const List = () => {
   const data = useContext(FilmContext)
   const [infoMsg, setInfoMsg] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 6
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = data.allMovies.slice(indexOfFirstItem, indexOfLastItem)
-  const handleChangePage = (page) => {
-    setCurrentPage(page)
-  }
 
   useEffect(() => {
     if (
@@ -38,17 +30,19 @@ const List = () => {
       ) : (
         <>
           <div className="listWrap">
-            {currentItems.map((value) => (
+            {data.allMovies.map((value) => (
               <FilmCard key={uuidv4()} filmData={value} />
             ))}
           </div>
           <div className="footer">
             <div className="pagination">
               <Pagination
-                current={currentPage}
-                total={data.allMovies.length}
-                defaultPageSize={itemsPerPage}
-                onChange={handleChangePage}
+                defaultCurrent={1}
+                current={data.currentPage}
+                total={data.totalResults}
+                pageSize={20}
+                onChange={data.handleChangePage}
+                showSizeChanger={false}
               />
             </div>
           </div>
